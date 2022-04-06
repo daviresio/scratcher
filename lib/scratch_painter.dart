@@ -27,7 +27,6 @@ class ScractcherPainter extends CustomPainter {
     // cor do background
     final paint = Paint()
       ..style = PaintingStyle.fill
-      ..strokeWidth = 10.0
       ..color = Colors.redAccent;
 
     // esse é o retangulo por cima da imagem

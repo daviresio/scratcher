@@ -30,7 +30,6 @@ class _HomePageState extends State<HomePage> {
             onPanUpdate: ((details) {
               setState(() {
                 offsets.add(details.globalPosition);
-                offsets = [...offsets];
               });
             }),
             child: CustomPaint(
