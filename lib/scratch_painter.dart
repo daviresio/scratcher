@@ -43,6 +43,7 @@ class ScractcherPainter extends CustomPainter {
 
     // pega a diferenca entre o path do retangulo e o path dos circulos, e apenas
     // o conteudo do retangulo que não tiver circulos por cima que é exibido.
+    // Esse PathOperation.xor é o mesmo que PathOperation.difference, mas aparentemente mais performatico nesse cenario
     final newPath =
         Path.combine(PathOperation.xor, pathBackground, pathScratch);
 
