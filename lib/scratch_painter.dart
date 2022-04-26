@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
-import 'dart:math' as math;
 
 class ScractcherPainter extends CustomPainter {
   final ui.Image image;
-  final List<Offset> points;
+  final List<List<Offset>> pointsList;
 
-  ScractcherPainter(this.image, this.points);
+  ScractcherPainter(this.image, this.pointsList);
 
   @override
   void paint(Canvas canvas, Size size) {
-    // criar um retangulo de 200x200 e redimensiona a imagem para caber nele.
-    // Pq a resolucao da imagem é maior que o tamanho da tela.
     final outputRect =
         Rect.fromLTWH(size.width / 2 - 100, size.height / 2 - 100, 200, 200);
     final imageSize = Size(image.width.toDouble(), image.height.toDouble());
@@ -21,37 +18,40 @@ class ScractcherPainter extends CustomPainter {
     final Rect outputSubrect =
         Alignment.center.inscribe(sizes.destination, outputRect);
 
-    // Desenha a imagem
     canvas.drawImageRect(image, inputSubrect, outputSubrect, Paint());
+    canvas.saveLayer(null, Paint());
 
-    // cor do background
+    final areaRect = Rect.fromLTRB(0, 0, size.width, size.height);
+    canvas.drawRect(areaRect, Paint()..color = Colors.blueAccent);
+
     final paint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = Colors.redAccent;
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 20.0
+      ..blendMode = BlendMode.src
+      ..color = Colors.transparent;
 
-    // esse é o retangulo por cima da imagem
     final pathBackground = Path();
     pathBackground.addRect(outputRect);
 
-    // pega os pontos capturados pelo gestureDetector e desenha um circulo neles
-    final pathScratch = Path();
-    for (var i = 0; i < points.length - 1; i += 5) {
-      pathScratch.addArc(
-          Rect.fromCircle(center: points[i], radius: 10), 0, math.pi * 2);
+    final path = Path();
+
+    for (var i = 0; i < pointsList.length; i++) {
+      final points = pointsList[i].toSet().toList();
+      for (var j = 0; j < points.length; j++) {
+        if (j == 0) {
+          path.moveTo(points[j].dx, points[j].dy);
+        } else {
+          path.lineTo(points[j].dx, points[j].dy);
+        }
+      }
     }
 
-    // pega a diferenca entre o path do retangulo e o path dos circulos, e apenas
-    // o conteudo do retangulo que não tiver circulos por cima que é exibido.
-    // Esse PathOperation.xor é o mesmo que PathOperation.difference, mas aparentemente mais performatico nesse cenario
-    final newPath =
-        Path.combine(PathOperation.xor, pathBackground, pathScratch);
-
-    // Desenha o path na tela
-    canvas.drawPath(newPath, paint..blendMode);
+    canvas.drawPath(path, paint);
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+  bool shouldRepaint(covariant ScractcherPainter oldDelegate) {
     return true;
   }
 }

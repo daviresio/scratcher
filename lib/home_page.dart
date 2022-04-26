@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:scratcher/helpers/image_helper.dart';
 import 'package:scratcher/scratch_painter.dart';
@@ -11,7 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Offset> offsets = [];
+  final List<List<Offset>> offsetsList = [];
+  final offsetsStream = StreamController<List<List<Offset>>>();
 
   @override
   Widget build(BuildContext context) {
@@ -19,21 +22,33 @@ class _HomePageState extends State<HomePage> {
       color: Colors.white,
       child: FutureBuilder<ui.Image>(
         future: ImageHelper.loadUiImage('assets/photo.jpg'),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+        builder: (context, imageLoaded) {
+          if (!imageLoaded.hasData) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          return GestureDetector(
-            onPanUpdate: ((details) {
-              setState(() {
-                offsets.add(details.globalPosition);
-              });
-            }),
-            child: CustomPaint(
-              painter: ScractcherPainter(snapshot.data!, offsets),
+          return Center(
+            child: GestureDetector(
+              onPanStart: (details) {
+                offsetsList.add([details.localPosition]);
+              },
+              onPanUpdate: ((details) {
+                offsetsList.last.add(details.localPosition);
+                offsetsStream.add(offsetsList);
+              }),
+              child: StreamBuilder<List<List<Offset>>>(
+                  stream: offsetsStream.stream,
+                  builder: (context, snapshot) {
+                    return CustomPaint(
+                      size: const Size(200, 200),
+                      painter: ScractcherPainter(
+                        imageLoaded.data!,
+                        snapshot.data ?? [],
+                      ),
+                    );
+                  }),
             ),
           );
         },
