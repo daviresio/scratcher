@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       color: Colors.white,
       child: FutureBuilder<ui.Image>(
-        future: ImageHelper.loadUiImage('assets/photo.jpg'),
+        future: ImageHelper.loadUiImage('assets/ticket.png'),
         builder: (context, imageLoaded) {
           if (!imageLoaded.hasData) {
             return const Center(
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                   stream: offsetsStream.stream,
                   builder: (context, snapshot) {
                     return CustomPaint(
-                      size: const Size(200, 200),
+                      size: const Size(400, 200),
                       painter: ScractcherPainter(
                         imageLoaded.data!,
                         snapshot.data ?? [],

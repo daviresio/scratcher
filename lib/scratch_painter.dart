@@ -9,8 +9,7 @@ class ScractcherPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final outputRect =
-        Rect.fromLTWH(size.width / 2 - 100, size.height / 2 - 100, 200, 200);
+    final outputRect = Rect.fromLTWH(0, 0, size.width, size.height);
     final imageSize = Size(image.width.toDouble(), image.height.toDouble());
     final sizes = applyBoxFit(BoxFit.cover, imageSize, outputRect.size);
     final Rect inputSubrect =
@@ -19,6 +18,7 @@ class ScractcherPainter extends CustomPainter {
         Alignment.center.inscribe(sizes.destination, outputRect);
 
     canvas.drawImageRect(image, inputSubrect, outputSubrect, Paint());
+
     canvas.saveLayer(null, Paint());
 
     final areaRect = Rect.fromLTRB(0, 0, size.width, size.height);
